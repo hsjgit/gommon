@@ -1,0 +1,17 @@
+package b64
+
+import (
+	"bytes"
+	"testing"
+)
+
+func TestB64Encode(t *testing.T) {
+	var data = []byte(`{"appdata":"eyJ1aWQiOjE1Njc3MzI5MDAxNjIsImdpZCI6MTU2NzczMjkwMDE2MiwiZXhwaXJlX3RpbWUiOjAsInJvb21faWQiOjIwMTgxNSwibmljZWdpZCI6MTU2NzczMjkwMDE2MiwibGV2ZWxpbnJvb20iOjIwLCJzdGFydHRpbWUiOjE1Njc3MzI5MDAsInNlbmRfdmlkZW8iOmZhbHNlLCJtb2JpbGUiOjAsInRpdGxlIjowLCJpcCI6IjE5Mi4xNjguMi4xMzkiLCJ6b25lIjoiNWJHQTVaK2Y1NzJSTGc9PSIsIm5pY2tuYW1lX2I2NCI6IjVyaTQ1YTZpTURFMk1nPT0iLCJ0ZWFtX2lkIjoiMTAwMiIsImFyZWFfaWQiOiIyIn0=","device":1,"gid":1567732900162,"level":20,"protocolversion":257,"roomid":201815,"roompara":"RoomPara","token":"65d3e06cdd8fac52fc1b5e3fd7914bca"}
+`)
+	var right = []byte(`eyJhcHBkYXRhIjoiZXlKMWFXUWlPakUxTmpjM016STVNREF4TmpJc0ltZHBaQ0k2TVRVMk56Y3pNamt3TURFMk1pd2laWGh3YVhKbFgzUnBiV1VpT2pBc0luSnZiMjFmYVdRaU9qSXdNVGd4TlN3aWJtbGpaV2RwWkNJNk1UVTJOemN6TWprd01ERTJNaXdpYkdWMlpXeHBibkp2YjIwaU9qSXdMQ0p6ZEdGeWRIUnBiV1VpT2pFMU5qYzNNekk1TURBc0luTmxibVJmZG1sa1pXOGlPbVpoYkhObExDSnRiMkpwYkdVaU9qQXNJblJwZEd4bElqb3dMQ0pwY0NJNklqRTVNaTR4TmpndU1pNHhNemtpTENKNmIyNWxJam9pTldKSFFUVmFLMlkxTnpKU1RHYzlQU0lzSW01cFkydHVZVzFsWDJJMk5DSTZJalZ5YVRRMVlUWnBUVVJGTWsxblBUMGlMQ0owWldGdFgybGtJam9pTVRBd01pSXNJbUZ5WldGZmFXUWlPaUl5SW4wPSIsImRldmljZSI6MSwiZ2lkIjoxNTY3NzMyOTAwMTYyLCJsZXZlbCI6MjAsInByb3RvY29sdmVyc2lvbiI6MjU3LCJyb29taWQiOjIwMTgxNSwicm9vbXBhcmEiOiJSb29tUGFyYSIsInRva2VuIjoiNjVkM2UwNmNkZDhmYWM1MmZjMWI1ZTNmZDc5MTRiY2EifQo=`)
+	result := Base64Encode(data)
+
+	if bytes.Compare([]byte(result), right) != 0 {
+		t.Errorf("compare failed")
+	}
+}
