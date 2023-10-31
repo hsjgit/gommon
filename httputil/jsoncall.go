@@ -8,11 +8,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-func JsonPost(addr string, req interface{}, resp interface{}, head map[string]string) (err error) {
+func JsonPost(addr string, req interface{}, resp interface{}, head *map[string]string) (err error) {
 	var headers = http.Header{}
 	headers.Add(contentTypeKey, ContentTypeJson)
 	headers.Add("Accept", "application/json")
-	for k, v := range head {
+	for k, v := range *head {
 		headers.Set(k, v)
 	}
 	var reqBody = &bytes.Buffer{}
@@ -26,7 +26,10 @@ func JsonPost(addr string, req interface{}, resp interface{}, head map[string]st
 	if err != nil {
 		return err
 	}
-
+	// Assignment count mismatch: 2 = 1
+	for k := range headers {
+		(*head)[k] = headers.Get(k)
+	}
 	err = json.Unmarshal(respData, resp)
 	return
 }
