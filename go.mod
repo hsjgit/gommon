@@ -1,6 +1,6 @@
 module github.com/hsjgit/gommon
 
-go 1.18
+go 1.21
 
 require (
 	github.com/go-playground/locales v0.14.0

@@ -2,7 +2,6 @@ package httputil
 
 import (
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"time"
@@ -38,7 +37,7 @@ func HttpGet(url string, params url.Values, headers http.Header) ([]byte, error)
 	}
 	defer resp.Body.Close()
 
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return empty, err
 	}
@@ -74,7 +73,7 @@ func HttpPost(dest string, body io.Reader, params url.Values, headers http.Heade
 
 	defer resp.Body.Close()
 
-	data, _ := ioutil.ReadAll(resp.Body)
+	data, _ := io.ReadAll(resp.Body)
 	return data, nil
 }
 
@@ -104,7 +103,7 @@ func HttpRequest(opt Options) ([]byte, error) {
 	}
 	defer resp.Body.Close()
 
-	data, _ := ioutil.ReadAll(resp.Body)
+	data, _ := io.ReadAll(resp.Body)
 
 	return data, nil
 }
