@@ -22,7 +22,7 @@ func JsonPost(addr string, req interface{}, resp interface{}, head map[string]st
 	}
 
 	var respData []byte
-	respData, err = HttpPost(addr, reqBody, nil, headers)
+	respData, err = HttpPost(addr, reqBody, nil, &headers)
 	if err != nil {
 		return err
 	}

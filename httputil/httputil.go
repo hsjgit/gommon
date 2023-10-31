@@ -17,15 +17,15 @@ type Options struct {
 	URL    string
 }
 
-func HttpGet(url string, params url.Values, headers http.Header) ([]byte, error) {
+func HttpGet(url string, params url.Values, headers *http.Header) ([]byte, error) {
 	var empty = []byte{}
 	if params != nil && len(params) != 0 {
 		url = url + "?" + params.Encode()
 	}
 	req, _ := http.NewRequest("GET", url, nil)
 
-	if headers != nil && len(headers) != 0 {
-		req.Header = headers
+	if headers != nil && len(*headers) != 0 {
+		req.Header = *headers
 	}
 
 	client := &http.Client{
@@ -34,6 +34,9 @@ func HttpGet(url string, params url.Values, headers http.Header) ([]byte, error)
 	resp, err := client.Do(req)
 	if err != nil {
 		return empty, err
+	}
+	for k := range resp.Header {
+		headers.Set(k, resp.Header.Get(k))
 	}
 	defer resp.Body.Close()
 
@@ -45,7 +48,7 @@ func HttpGet(url string, params url.Values, headers http.Header) ([]byte, error)
 	return data, nil
 }
 
-func HttpPost(dest string, body io.Reader, params url.Values, headers http.Header) ([]byte, error) {
+func HttpPost(dest string, body io.Reader, params url.Values, headers *http.Header) ([]byte, error) {
 	client := &http.Client{
 		Timeout: time.Second,
 	}
@@ -61,7 +64,7 @@ func HttpPost(dest string, body io.Reader, params url.Values, headers http.Heade
 	}
 
 	if headers != nil {
-		req.Header = headers
+		req.Header = *headers
 	} else {
 		req.Header.Add("Content-Type", "text/plain")
 	}
@@ -70,7 +73,9 @@ func HttpPost(dest string, body io.Reader, params url.Values, headers http.Heade
 	if err != nil {
 		return nil, errors.Wrapf(err, "post failed")
 	}
-
+	for k := range resp.Header {
+		headers.Set(k, resp.Header.Get(k))
+	}
 	defer resp.Body.Close()
 
 	data, _ := io.ReadAll(resp.Body)
