@@ -82,6 +82,40 @@ func HttpPost(dest string, body io.Reader, params url.Values, headers *http.Head
 	return data, nil
 }
 
+func HttpPatch(dest string, body io.Reader, params url.Values, headers *http.Header) ([]byte, error) {
+	client := &http.Client{
+		Timeout: time.Second,
+	}
+
+	if params != nil {
+		dest = dest + "?" + params.Encode()
+	}
+
+	req, err := http.NewRequest(http.MethodPatch, dest, body)
+	if err != nil {
+		errors.Wrapf(err, "build req failed")
+		return nil, err
+	}
+
+	if headers != nil {
+		req.Header = *headers
+	} else {
+		req.Header.Add("Content-Type", "text/plain")
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, errors.Wrapf(err, "post failed")
+	}
+	for k := range resp.Header {
+		headers.Set(k, resp.Header.Get(k))
+	}
+	defer resp.Body.Close()
+
+	data, _ := io.ReadAll(resp.Body)
+	return data, nil
+}
+
 func HttpRequest(opt Options) ([]byte, error) {
 	client := &http.Client{
 		Timeout: time.Second * 5,
