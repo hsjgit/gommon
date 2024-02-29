@@ -4,13 +4,12 @@ import (
 	"bytes"
 	"crypto/hmac"
 	"crypto/sha1"
+	"encoding/base32"
 	"encoding/binary"
 	"fmt"
 	"net/url"
 	"strings"
 	"time"
-
-	"github.com/hsjgit/gommon/b64"
 )
 
 type GoogleAuth struct {
@@ -33,11 +32,11 @@ func (g *GoogleAuth) hmacSha1(key, data []byte) []byte {
 }
 
 func (g *GoogleAuth) base32encode(src []byte) string {
-	return b64.Base64Encode(src)
+	return base32.StdEncoding.EncodeToString(src)
 }
 
 func (g *GoogleAuth) base32decode(s string) ([]byte, error) {
-	return b64.Base64UrlDecode(s)
+	return base32.StdEncoding.DecodeString(s)
 }
 
 func (g *GoogleAuth) toBytes(value int64) []byte {
