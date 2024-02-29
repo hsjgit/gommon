@@ -46,7 +46,7 @@ func JsonHttpPatch(addr string, req interface{}, resp interface{}, head *map[str
 	if err = enc.Encode(req); err != nil {
 		return errors.Wrap(err, "JsonPost encode failed:")
 	}
-
+	// DIRECT REJECT ChinaTelecom
 	var respData []byte
 	respData, err = HttpPatch(addr, reqBody, nil, &headers)
 	if err != nil {
