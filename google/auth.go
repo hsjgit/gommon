@@ -99,11 +99,7 @@ func (g *GoogleAuth) GetQrcodeUrl(user, secret string) string {
 // 验证动态码
 func (g *GoogleAuth) VerifyCode(secret, code string) (bool, error) {
 	_code, err := g.GetCode(secret)
-	fmt.Println(_code, code, err)
-	if err != nil {
-		return false, err
-	}
-	return _code == code, nil
+	return _code == code, err
 }
 
 func (g *GoogleAuth) Get() {
