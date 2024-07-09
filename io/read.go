@@ -81,6 +81,7 @@ func (h *HashReader) Read(p []byte) (int, error) {
 	n, err := h.Reader.Read(p)
 	if n != 0 {
 		io.Copy(h.hash, bytes.NewBuffer(p[:n]))
+		h.ch <- int64(n)
 	}
 
 	if h.fmtfun != nil {
@@ -91,7 +92,6 @@ func (h *HashReader) Read(p []byte) (int, error) {
 		close(h.ch)
 		return n, err
 	}
-	h.ch <- int64(n)
 	return n, nil
 }
 
