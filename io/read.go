@@ -24,8 +24,8 @@ type HashReader struct {
 }
 
 type Controller interface {
-	statistics(flow chan int64)
-	getSpeed() *int64
+	IoControler(flow chan int64)
+	GetSpeed() *int64
 }
 
 type flowController struct {
@@ -34,7 +34,7 @@ type flowController struct {
 }
 
 // 统计流量读取的速度
-func (f *flowController) statistics(flow chan int64) {
+func (f *flowController) IoControler(flow chan int64) {
 	ticker := time.NewTicker(time.Second * 1)
 	defer ticker.Stop()
 	for {
@@ -54,7 +54,9 @@ func (f *flowController) statistics(flow chan int64) {
 
 // git tag v0.0.7
 // git push origin v0.0.7
-func (f *flowController) getSpeed() *int64 {
+// 删除远程tag
+// git tag rm origin v0.0.7
+func (f *flowController) GetSpeed() *int64 {
 	return &f.speed
 }
 
@@ -66,7 +68,7 @@ func NewHashReader(r io.Reader, h hash.Hash, controller Controller) *HashReader 
 		c:      controller,
 	}
 	if readhand.c != nil {
-		go readhand.c.statistics(readhand.ch)
+		go readhand.c.IoControler(readhand.ch)
 	}
 	return readhand
 }
@@ -98,5 +100,5 @@ func (h *HashReader) GetHashStr() string {
 }
 
 func (h *HashReader) GetSeep() int64 {
-	return atomic.LoadInt64(h.c.getSpeed())
+	return atomic.LoadInt64(h.c.GetSpeed())
 }
