@@ -13,14 +13,19 @@ import (
 	"github.com/hsjgit/gommon/humanize"
 )
 
-// 一个具有计算hash功能的io.Reader
+// HashReader 一个具有计算hash功能的io.Reader
 type HashReader struct {
 	io.Reader
 	hash    hash.Hash
 	hashStr string
 	fmtfun  func()
 	ch      chan int64
-	f       flowController
+	c       Controller
+}
+
+type Controller interface {
+	statistics(flow chan int64)
+	getSpeed() *int64
 }
 
 type flowController struct {
@@ -47,14 +52,22 @@ func (f *flowController) statistics(flow chan int64) {
 
 }
 
-func NewHashReader(r io.Reader, h hash.Hash) *HashReader {
+// git tag v0.0.7
+// git push origin v0.0.7
+func (f *flowController) getSpeed() *int64 {
+	return &f.speed
+}
+
+func NewHashReader(r io.Reader, h hash.Hash, controller Controller) *HashReader {
 	readhand := &HashReader{
 		Reader: r,
 		hash:   h,
 		ch:     make(chan int64, 1),
-		f:      flowController{},
+		c:      controller,
 	}
-	go readhand.f.statistics(readhand.ch)
+	if readhand.c != nil {
+		go readhand.c.statistics(readhand.ch)
+	}
 	return readhand
 }
 
@@ -85,5 +98,5 @@ func (h *HashReader) GetHashStr() string {
 }
 
 func (h *HashReader) GetSeep() int64 {
-	return atomic.LoadInt64(&h.f.speed)
+	return atomic.LoadInt64(h.c.getSpeed())
 }
