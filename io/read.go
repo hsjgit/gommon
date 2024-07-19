@@ -4,13 +4,10 @@ import (
 	"bytes"
 	"crypto/md5"
 	"encoding/hex"
-	"fmt"
 	"hash"
 	"io"
 	"sync/atomic"
 	"time"
-
-	"github.com/hsjgit/gommon/humanize"
 )
 
 // HashReader 一个具有计算hash功能的io.Reader
@@ -33,6 +30,8 @@ type flowController struct {
 	limit int64
 }
 
+var DefaultFlowController = &flowController{}
+
 // 统计流量读取的速度
 func (f *flowController) IoControler(flow chan int64) {
 	ticker := time.NewTicker(time.Second * 1)
@@ -40,13 +39,9 @@ func (f *flowController) IoControler(flow chan int64) {
 	for {
 		select {
 		case <-ticker.C:
-			fmt.Println(fmt.Sprintf("当前速度为:%s/S", humanize.IBytes(uint64(atomic.LoadInt64(&f.speed)))))
-			atomic.StoreInt64(&f.speed, 0)
-		case num, ok := <-flow:
-			if !ok {
-				return
-			}
-			atomic.AddInt64(&f.speed, num)
+
+		case <-flow:
+
 		}
 	}
 
@@ -67,9 +62,10 @@ func NewHashReader(r io.Reader, h hash.Hash, controller Controller) *HashReader 
 		ch:     make(chan int64, 1),
 		c:      controller,
 	}
-	if readhand.c != nil {
-		go readhand.c.IoControler(readhand.ch)
+	if readhand.c == nil {
+		readhand.c = DefaultFlowController
 	}
+	go readhand.c.IoControler(readhand.ch)
 	return readhand
 }
 
