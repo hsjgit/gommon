@@ -46,8 +46,6 @@ func (f *flowController) IoControler(flow chan int64) {
 
 // git tag v0.0.7
 // git push origin v0.0.7
-// 删除远程tag
-// git tag rm origin v0.0.7
 func (f *flowController) GetSpeed() *int64 {
 	return &f.speed
 }
