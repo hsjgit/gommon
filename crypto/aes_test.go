@@ -5,7 +5,6 @@ import (
 	"testing"
 )
 
-// 82b97f8395b54e4b1f1bdb9b53e1a2be
 func TestAES(t *testing.T) {
 	a, err := AesEncryptWithSalt([]byte("ajdJ:isJIAklsias"), []byte("huangshije"))
 	if err != nil {

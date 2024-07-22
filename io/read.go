@@ -7,7 +7,6 @@ import (
 	"hash"
 	"io"
 	"sync/atomic"
-	"time"
 )
 
 // HashReader 一个具有计算hash功能的io.Reader
@@ -34,14 +33,12 @@ var DefaultFlowController = &flowController{}
 
 // 统计流量读取的速度
 func (f *flowController) IoControler(flow chan int64) {
-	ticker := time.NewTicker(time.Second * 1)
-	defer ticker.Stop()
 	for {
 		select {
-		case <-ticker.C:
-
-		case <-flow:
-
+		case _, ok := <-flow:
+			if !ok {
+				return
+			}
 		}
 	}
 
