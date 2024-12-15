@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"hash"
 	"io"
+	"sync"
 	"sync/atomic"
 )
 
@@ -17,6 +18,8 @@ type HashReader struct {
 	fmtfun  func()
 	ch      chan int64
 	c       Controller
+	once    sync.Once
+	done    bool
 }
 
 type Controller interface {
@@ -57,10 +60,10 @@ func NewHashReader(r io.Reader, h hash.Hash, controller Controller) *HashReader 
 		ch:     make(chan int64, 1),
 		c:      controller,
 	}
-	if readhand.c == nil {
-		readhand.c = DefaultFlowController
+	if readhand.c != nil {
+		go readhand.c.IoControler(readhand.ch)
 	}
-	go readhand.c.IoControler(readhand.ch)
+
 	return readhand
 }
 
@@ -72,7 +75,9 @@ func (h *HashReader) Read(p []byte) (int, error) {
 	n, err := h.Reader.Read(p)
 	if n != 0 {
 		io.Copy(h.hash, bytes.NewBuffer(p[:n]))
-		h.ch <- int64(n)
+		if !h.done {
+			h.ch <- int64(n)
+		}
 	}
 
 	if h.fmtfun != nil {
@@ -80,7 +85,10 @@ func (h *HashReader) Read(p []byte) (int, error) {
 	}
 	if err != nil {
 		h.hashStr = hex.EncodeToString(h.hash.Sum(nil))
-		close(h.ch)
+		h.once.Do(func() {
+			close(h.ch)
+			h.done = true
+		})
 		return n, err
 	}
 	return n, nil
